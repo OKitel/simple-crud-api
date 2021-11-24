@@ -1,6 +1,6 @@
 const persons = [
-  { id: 1, name: "Inan" },
-  { id: 2, name: "Dima" },
+  { id: 1, name: "John Smith" },
+  { id: 2, name: "John" },
 ];
 
 const getPersons = (request, response) => {
@@ -12,14 +12,46 @@ const getPersons = (request, response) => {
   response.send(persons);
 };
 
+const getOnePerson = (request, response) => {
+  if (request.pathParams.personId) {
+    return response.send(
+      persons.find((person) => person.id == request.pathParams.personId)
+    );
+  }
+  response.send(persons);
+};
+
 const createPerson = (request, response) => {
   const person = request.body;
   persons.push(person);
-
   response.send(person);
 };
 
+const updateFullPerson = (request, response) => {
+  //TODO
+  const person = request.body;
+  persons.push(person);
+  response.send(person);
+};
+
+const updatePartPerson = (request, response) => {
+  //TODO
+  const person = request.body;
+  persons.push(person);
+  response.send(person);
+};
+
+const deletePerson = (request, response) => {
+  //TODO
+  const person = request.body;
+  persons.push(person);
+  response.send(person);
+};
 module.exports = {
   getPersons,
   createPerson,
+  getOnePerson,
+  deletePerson,
+  updateFullPerson,
+  updatePartPerson
 };
