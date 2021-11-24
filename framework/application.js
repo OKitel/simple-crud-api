@@ -19,8 +19,17 @@ module.exports = class Application {
         this.emitter.on(
           this._getRouteMask(path, method),
           (request, response) => {
-            const handler = endpoint[method];
-            handler(request, response);
+            try {
+              const handler = endpoint[method];
+              handler(request, response);
+            } catch (error) {
+              response.writeHead(500, {
+                "Content-type": "application/json",
+              });
+              response.end(
+                JSON.stringify({ message: "Internal server error" })
+              );
+            }
           }
         );
       });
@@ -41,14 +50,26 @@ module.exports = class Application {
         if (body) {
           request.body = JSON.parse(body);
         }
-        this.middlewares.forEach((middleware) => middleware(request, response));
-        const emitted = this.emitter.emit(
-          this._getRouteMask(request.pathname, request.method),
-          request,
-          response
-        );
-        if (!emitted) {
-          response.end();
+        try {
+          this.middlewares.forEach((middleware) =>
+            middleware(request, response)
+          );
+          const emitted = this.emitter.emit(
+            this._getRouteMask(request.pathname, request.method),
+            request,
+            response
+          );
+          if (!emitted) {
+            response.writeHead(404, {
+              "Content-type": "application/json",
+            });
+            response.end(JSON.stringify({ message: "Not found!" }));
+          }
+        } catch (error) {
+          response.writeHead(500, {
+            "Content-type": "application/json",
+          });
+          response.end(JSON.stringify({ message: "Internal server error" }));
         }
       });
     });

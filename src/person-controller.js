@@ -53,5 +53,5 @@ module.exports = {
   getOnePerson,
   deletePerson,
   updateFullPerson,
-  updatePartPerson
+  updatePartPerson,
 };
