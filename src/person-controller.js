@@ -1,25 +1,39 @@
 const { v4: uuidv4 } = require("uuid");
-const persons = [
-  { id: 1, name: "John Smith" },
-  { id: 2, name: "John" },
-];
+const persons = [];
 
 const getPersons = (request, response) => {
-  if (request.params.id) {
-    return response.send(
-      persons.find((person) => person.id == request.params.id)
-    );
-  }
   response.send(persons);
 };
 
 const getOnePerson = (request, response) => {
-  if (request.pathParams.personId) {
-    return response.send(
-      persons.find((person) => person.id == request.pathParams.personId)
-    );
+  const personId = request.pathParams.personId;
+  if (personId) {
+    if (
+      personId.match(
+        /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+      )
+    ) {
+      const person = persons.find(
+        (person) => person.id == request.pathParams.personId
+      );
+      if (!person) {
+        response.writeHead(404, {
+          "Content-type": "application/json",
+        });
+        return response.end(
+          JSON.stringify({ message: `Not found person with id = ${personId}` })
+        );
+      }
+      return response.send(person);
+    } else {
+      response.writeHead(400, {
+        "Content-type": "application/json",
+      });
+      response.end(
+        JSON.stringify({ message: "Bad request: incorrect id format!" })
+      );
+    }
   }
-  response.send(persons);
 };
 
 const createPerson = (request, response) => {
