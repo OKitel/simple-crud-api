@@ -1,6 +1,13 @@
 const { v4: uuidv4 } = require("uuid");
 const persons = [];
 
+const badRequestResponse = (response, message) => {
+  response.writeHead(400, {
+    "Content-type": "application/json",
+  });
+  return response.end(JSON.stringify({ message: `Bad request: ${message}` }));
+};
+
 const getPersons = (request, response) => {
   response.send(persons);
 };
@@ -26,20 +33,48 @@ const getOnePerson = (request, response) => {
       }
       return response.send(person);
     } else {
-      response.writeHead(400, {
-        "Content-type": "application/json",
-      });
-      response.end(
-        JSON.stringify({ message: "Bad request: incorrect id format!" })
-      );
+      return badRequestResponse(response, "incorrect id format");
     }
   }
 };
 
 const createPerson = (request, response) => {
   const person = request.body;
+
   person.id = uuidv4();
+
+  if (typeof person.name !== "string") {
+    return badRequestResponse(
+      response,
+      "Person name is required and should be a string!"
+    );
+  }
+
+  if (typeof person.age !== "number") {
+    return badRequestResponse(
+      response,
+      "Person age is required and should be a number!"
+    );
+  }
+
+  if (!Array.isArray(person.hobbies)) {
+    return badRequestResponse(
+      response,
+      "Hobbies are required: can be an empty array or an array of strings!"
+    );
+  }
+
+  if (!person.hobbies.every((item) => typeof item === "string")) {
+    return badRequestResponse(
+      response,
+      "Hobbies array should contain only strings!"
+    );
+  }
+
   persons.push(person);
+  response.writeHead(201, {
+    "Content-type": "application/json",
+  });
   response.send(person);
 };
 
@@ -66,12 +101,7 @@ const updateFullPerson = (request, response) => {
       persons.splice(personIndex, 1, updatedPerson);
       return response.send(updatedPerson);
     } else {
-      response.writeHead(400, {
-        "Content-type": "application/json",
-      });
-      response.end(
-        JSON.stringify({ message: "Bad request: incorrect id format!" })
-      );
+      return badRequestResponse(response, "incorrect id format!");
     }
   }
 };
@@ -100,12 +130,7 @@ const updatePartPerson = (request, response) => {
       persons.splice(personIndex, 1, mergedPerson);
       return response.send(mergedPerson);
     } else {
-      response.writeHead(400, {
-        "Content-type": "application/json",
-      });
-      response.end(
-        JSON.stringify({ message: "Bad request: incorrect id format!" })
-      );
+      return badRequestResponse(response, "incorrect id format!");
     }
   }
 };
@@ -134,12 +159,7 @@ const deletePerson = (request, response) => {
       });
       return response.end();
     } else {
-      response.writeHead(400, {
-        "Content-type": "application/json",
-      });
-      response.end(
-        JSON.stringify({ message: "Bad request: incorrect id format!" })
-      );
+      return badRequestResponse(response, "incorrect id format!");
     }
   }
 };
