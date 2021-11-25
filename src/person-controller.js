@@ -17,23 +17,22 @@ const getPersons = (request, response) => {
 
 const getOnePerson = (request, response) => {
   const personId = request.pathParams.personId;
-  if (personId) {
-    if (personId.match(UUID_MATCHER)) {
-      const person = persons.find(
-        (person) => person.id == request.pathParams.personId
+
+  if (personId.match(UUID_MATCHER)) {
+    const person = persons.find(
+      (person) => person.id == request.pathParams.personId
+    );
+    if (!person) {
+      response.writeHead(404, {
+        "Content-type": "application/json",
+      });
+      return response.end(
+        JSON.stringify({ message: `Not found person with id = ${personId}` })
       );
-      if (!person) {
-        response.writeHead(404, {
-          "Content-type": "application/json",
-        });
-        return response.end(
-          JSON.stringify({ message: `Not found person with id = ${personId}` })
-        );
-      }
-      return response.send(person);
-    } else {
-      return badRequestResponse(response, "incorrect id format");
     }
+    return response.send(person);
+  } else {
+    return badRequestResponse(response, "incorrect id format");
   }
 };
 
@@ -56,6 +55,10 @@ const createPerson = (request, response) => {
     );
   }
 
+  if (person.age <= 0) {
+    return badRequestResponse(response, "Person age should be more than 0.");
+  }
+
   if (!Array.isArray(person.hobbies)) {
     return badRequestResponse(
       response,
@@ -69,7 +72,6 @@ const createPerson = (request, response) => {
       "Hobbies array should contain only strings!"
     );
   }
-
   persons.push(person);
   response.writeHead(201, {
     "Content-type": "application/json",
@@ -79,75 +81,144 @@ const createPerson = (request, response) => {
 
 const updateFullPerson = (request, response) => {
   const personId = request.pathParams.personId;
-  if (personId) {
-    if (personId.match(UUID_MATCHER)) {
-      const updatedPerson = request.body;
-      updatedPerson.id = personId;
-      const person = persons.find((person) => person.id == personId);
-      const personIndex = persons.indexOf(person);
-      if (personIndex === -1) {
-        response.writeHead(404, {
-          "Content-type": "application/json",
-        });
-        return response.end(
-          JSON.stringify({ message: `Not found person with id = ${personId}` })
-        );
-      }
-      persons.splice(personIndex, 1, updatedPerson);
-      return response.send(updatedPerson);
-    } else {
-      return badRequestResponse(response, "incorrect id format!");
+  if (personId.match(UUID_MATCHER)) {
+    const updatedPerson = request.body;
+
+    if (typeof updatedPerson.name !== "string") {
+      return badRequestResponse(
+        response,
+        "Person name is required and should be a string!"
+      );
     }
+
+    if (typeof updatedPerson.age !== "number") {
+      return badRequestResponse(
+        response,
+        "Person age is required and should be a number!"
+      );
+    }
+
+    if (updatedPerson.age <= 0) {
+      return badRequestResponse(response, "Person age should be more than 0.");
+    }
+
+    if (!Array.isArray(updatedPerson.hobbies)) {
+      return badRequestResponse(
+        response,
+        "Hobbies are required: can be an empty array or an array of strings!"
+      );
+    }
+
+    if (!updatedPerson.hobbies.every((item) => typeof item === "string")) {
+      return badRequestResponse(
+        response,
+        "Hobbies array should contain only strings!"
+      );
+    }
+    updatedPerson.id = personId;
+    const person = persons.find((person) => person.id == personId);
+    const personIndex = persons.indexOf(person);
+    if (personIndex === -1) {
+      response.writeHead(404, {
+        "Content-type": "application/json",
+      });
+      return response.end(
+        JSON.stringify({ message: `Not found person with id = ${personId}` })
+      );
+    }
+    persons.splice(personIndex, 1, updatedPerson);
+    return response.send(updatedPerson);
+  } else {
+    return badRequestResponse(response, "incorrect id format!");
   }
 };
 
 const updatePartPerson = (request, response) => {
   const personId = request.pathParams.personId;
-  if (personId) {
-    if (personId.match(UUID_MATCHER)) {
-      const updatedPerson = request.body;
-      updatedPerson.id = personId;
-      const person = persons.find((person) => person.id == personId);
-      const mergedPerson = { ...person, ...updatedPerson };
-      const personIndex = persons.indexOf(person);
-      if (personIndex === -1) {
-        response.writeHead(404, {
-          "Content-type": "application/json",
-        });
-        return response.end(
-          JSON.stringify({ message: `Not found person with id = ${personId}` })
-        );
-      }
-      persons.splice(personIndex, 1, mergedPerson);
-      return response.send(mergedPerson);
-    } else {
-      return badRequestResponse(response, "incorrect id format!");
+  if (personId.match(UUID_MATCHER)) {
+    const updatedPerson = request.body;
+    if (
+      typeof updatedPerson.name !== "string" &&
+      updatedPerson.name !== undefined
+    ) {
+      return badRequestResponse(
+        response,
+        "Person name is required and should be a string!"
+      );
     }
+
+    if (
+      typeof updatedPerson.age !== "number" &&
+      updatedPerson.age !== undefined
+    ) {
+      return badRequestResponse(
+        response,
+        "Person age is required and should be a number!"
+      );
+    }
+
+    if (updatedPerson.age !== undefined && updatedPerson.age <= 0) {
+      return badRequestResponse(response, "Person age should be more than 0.");
+    }
+
+    if (
+      !Array.isArray(updatedPerson.hobbies) &&
+      updatedPerson.hobbies !== undefined
+    ) {
+      return badRequestResponse(
+        response,
+        "Hobbies are required: can be an empty array or an array of strings!"
+      );
+    }
+
+    if (
+      updatedPerson.hobbies &&
+      !updatedPerson.hobbies.every((item) => typeof item === "string")
+    ) {
+      return badRequestResponse(
+        response,
+        "Hobbies array should contain only strings!"
+      );
+    }
+    updatedPerson.id = personId;
+    const person = persons.find((person) => person.id == personId);
+    const mergedPerson = { ...person, ...updatedPerson };
+    const personIndex = persons.indexOf(person);
+    if (personIndex === -1) {
+      response.writeHead(404, {
+        "Content-type": "application/json",
+      });
+      return response.end(
+        JSON.stringify({ message: `Not found person with id = ${personId}` })
+      );
+    }
+    persons.splice(personIndex, 1, mergedPerson);
+    return response.send(mergedPerson);
+  } else {
+    return badRequestResponse(response, "incorrect id format!");
   }
 };
 
 const deletePerson = (request, response) => {
   const personId = request.pathParams.personId;
-  if (personId) {
-    if (personId.match(UUID_MATCHER)) {
-      const person = persons.find((person) => person.id == personId);
-      const personIndex = persons.indexOf(person);
-      if (personIndex === -1) {
-        response.writeHead(404, {
-          "Content-type": "application/json",
-        });
-        return response.end(
-          JSON.stringify({ message: `Not found person with id = ${personId}` })
-        );
-      }
-      persons.splice(personIndex, 1);
-      response.writeHead(204, `The person was successfully deleted`, {
+  if (personId.match(UUID_MATCHER)) {
+    const person = persons.find((person) => person.id == personId);
+    const personIndex = persons.indexOf(person);
+    if (personIndex === -1) {
+      response.writeHead(404, {
         "Content-type": "application/json",
       });
-      return response.end();
-    } else {
-      return badRequestResponse(response, "incorrect id format!");
+      return response.end(
+        JSON.stringify({ message: `Not found person with id = ${personId}` })
+      );
     }
+    persons.splice(personIndex, 1);
+    response.writeHead(204, {
+      "Content-type": "application/json",
+    });
+    return response.end();
+  } else {
+    return badRequestResponse(response, "incorrect id format!");
   }
 };
 module.exports = {
