@@ -48,8 +48,20 @@ module.exports = class Application {
         body += chunk;
       });
       request.on("end", () => {
-        if (body) {
-          request.body = JSON.parse(body);
+        try {
+          if (body) {
+            request.body = JSON.parse(body);
+          }
+        } catch (error) {
+          console.error(error);
+          response.writeHead(400, {
+            "Content-type": "application/json",
+          });
+          return response.end(
+            JSON.stringify({
+              message: `Bad request: invalid body! Error: ${error.message}`,
+            })
+          );
         }
         try {
           this.middlewares.forEach((middleware) =>
