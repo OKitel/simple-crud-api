@@ -63,10 +63,37 @@ const updateFullPerson = (request, response) => {
 };
 
 const updatePartPerson = (request, response) => {
-  //TODO
-  const person = request.body;
-  persons.push(person);
-  response.send(person);
+  const personId = request.pathParams.personId;
+  if (personId) {
+    if (
+      personId.match(
+        /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+      )
+    ) {
+      const updatedPerson = request.body;
+      updatedPerson.id = personId;
+      const person = persons.find((person) => person.id == personId);
+      const mergedPerson = { ...person, ...updatedPerson };
+      const personIndex = persons.indexOf(person);
+      if (personIndex === -1) {
+        response.writeHead(404, {
+          "Content-type": "application/json",
+        });
+        return response.end(
+          JSON.stringify({ message: `Not found person with id = ${personId}` })
+        );
+      }
+      persons.splice(personIndex, 1, mergedPerson);
+      return response.send(mergedPerson);
+    } else {
+      response.writeHead(400, {
+        "Content-type": "application/json",
+      });
+      response.end(
+        JSON.stringify({ message: "Bad request: incorrect id format!" })
+      );
+    }
+  }
 };
 
 const deletePerson = (request, response) => {
