@@ -23,6 +23,7 @@ module.exports = class Application {
               const handler = endpoint[method];
               handler(request, response);
             } catch (error) {
+              console.error(error);
               response.writeHead(500, {
                 "Content-type": "application/json",
               });
@@ -66,6 +67,7 @@ module.exports = class Application {
             response.end(JSON.stringify({ message: "Not found!" }));
           }
         } catch (error) {
+          console.error(error);
           response.writeHead(500, {
             "Content-type": "application/json",
           });

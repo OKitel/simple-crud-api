@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require("uuid");
 const persons = [
   { id: 1, name: "John Smith" },
   { id: 2, name: "John" },
@@ -23,6 +24,7 @@ const getOnePerson = (request, response) => {
 
 const createPerson = (request, response) => {
   const person = request.body;
+  person.id = uuidv4();
   persons.push(person);
   response.send(person);
 };
