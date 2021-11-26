@@ -31,7 +31,7 @@ it("create the person", (done) => {
           hobbies: [],
         })
       );
-      request.delete(`/person/${personId}`).then(done());
+      request.delete(`/person/${personId}`).then(() => done());
     })
     .catch((err) => done(err));
 });
@@ -44,56 +44,65 @@ it("E2E scenario #1", (done) => {
     .expect(200)
     .then((response) => {
       expect(response.body).toStrictEqual([]);
-    })
-    .catch((err) => done(err));
-  request
-    .post("/person")
-    .send({ name: "John Doe", age: 33, hobbies: [] })
-    .then((response) => {
-      const personId = response.body.id;
-      expect(response.body).toEqual(
-        expect.objectContaining({
-          name: "John Doe",
-          age: 33,
-          hobbies: [],
-        })
-      );
-      request.get(`/person/${personId}`).then((response) => {
-        expect(response.body).toEqual(
-          expect.objectContaining({
-            name: "John Doe",
-            age: 33,
-            hobbies: [],
-          })
-        );
-      });
       request
-        .put(`/person/${personId}`)
-        .send({
-          name: "John Doe",
-          age: 33,
-          hobbies: ["playing piano", "horse riding"],
-        })
+        .post("/person")
+        .send({ name: "John Doe", age: 33, hobbies: [] })
         .then((response) => {
-          expect(response.body)
-            .toEqual(
-              expect.objectContaining({
-                name: "John Doe",
-                age: 33,
-                hobbies: ["playing piano", "horse riding"],
-              })
-            )
-            .then(() => {
-              request.delete(`/person/${personId}`).expect(204);
+          const personId = response.body.id;
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              name: "John Doe",
+              age: 33,
+              hobbies: [],
             })
-            .then(() => {
-              request.get(`/person/${personId}`).then((response) => {
-                expect(response.body.message).toEqual("Not found!");
-              });
-            });
-        });
+          );
+          request
+            .get(`/person/${personId}`)
+            .then((response) => {
+              expect(response.body).toEqual(
+                expect.objectContaining({
+                  name: "John Doe",
+                  age: 33,
+                  hobbies: [],
+                })
+              );
+              request
+                .put(`/person/${personId}`)
+                .send({
+                  name: "John Doe",
+                  age: 33,
+                  hobbies: ["playing piano", "horse riding"],
+                })
+                .then((response) => {
+                  expect(response.body).toEqual(
+                    expect.objectContaining({
+                      name: "John Doe",
+                      age: 33,
+                      hobbies: ["playing piano", "horse riding"],
+                    })
+                  );
 
-      done();
+                  request
+                    .delete(`/person/${personId}`)
+                    .expect(204)
+                    .then(() => {
+                      request
+                        .get(`/person/${personId}`)
+                        .then((response) => {
+                          expect(response.body.message).toEqual(
+                            `Not found person with id = ${personId}`
+                          );
+                          done();
+                        })
+                        .catch(done);
+                    })
+                    .catch(done);
+                })
+                .catch(done);
+            })
+            .catch(done);
+        })
+        .catch(done);
     })
-    .catch((err) => done(err));
+    .catch(done);
 });
