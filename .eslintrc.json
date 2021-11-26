@@ -13,7 +13,9 @@
     "import/prefer-default-export": "off",
     "no-process-exit": "off",
     "jest/no-done-callback": "off",
-    "node/no-extraneous-import": "off"
+    "jest/no-conditional-expect": "off",
+    "node/no-extraneous-import": "off",
+    "node/no-unpublished-require": "off"
   },
   "overrides": [
     {
