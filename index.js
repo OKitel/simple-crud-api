@@ -1,8 +1,8 @@
-const Application = require("./framework/application");
+const Application = require("./server/application");
 const personRouter = require("./src/person-router");
-const jsonParser = require("./framework/parseJson");
-const parseUrl = require("./framework/parseUrl");
-const parsePathParams = require("./framework/parsePathParams");
+const jsonParser = require("./server/parseJson");
+const parseUrl = require("./server/parseUrl");
+const parsePathParams = require("./server/parsePathParams");
 
 const PORT = process.env.PORT || 3000;
 const application = new Application();
