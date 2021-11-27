@@ -1,5 +1,5 @@
 const Application = require("./server/application");
-const personRouter = require("./src/person-router");
+const personRouter = require("./person-router");
 const jsonParser = require("./server/parseJson");
 const parseUrl = require("./server/parseUrl");
 const parsePathParams = require("./server/parsePathParams");

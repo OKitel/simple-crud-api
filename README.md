@@ -49,6 +49,6 @@ Value of port on which application is running is stored in **.env** file. You ma
 PORT=3030
 ```
 
-To test all cases you may use postman requests collection, which is located inside the project root directory: [simple-crud-api.postman_collection.json](simple-crud-api.postman_collection.json)
+To test all cases you may use postman requests collection, which is located inside the postman directory: [simple-crud-api.postman_collection.json](./postman/simple-crud-api.postman_collection.json)
 
 ![Ciphering CLI tool](./assets/postman-icon.png)

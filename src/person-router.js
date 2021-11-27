@@ -1,4 +1,4 @@
-const Router = require("../server/router");
+const Router = require("./server/router");
 const controller = require("./person-controller");
 const router = new Router();
 
