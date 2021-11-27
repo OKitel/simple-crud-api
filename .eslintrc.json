@@ -1,0 +1,29 @@
+{
+  "env": {
+    "node": true,
+    "commonjs": true,
+    "jest": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:jest/recommended",
+    "plugin:node/recommended"
+  ],
+  "rules": {
+    "import/prefer-default-export": "off",
+    "no-process-exit": "off",
+    "jest/no-done-callback": "off",
+    "jest/no-conditional-expect": "off",
+    "node/no-extraneous-import": "off",
+    "node/no-unpublished-require": "off"
+  },
+  "overrides": [
+    {
+      "files": ["webpack.config.js"],
+      "rules": {
+        "node/no-unpublished-require": "off"
+      }
+    }
+  ],
+  "plugins": ["jest", "node", "prettier"]
+}
