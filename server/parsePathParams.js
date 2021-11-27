@@ -8,9 +8,7 @@ module.exports = (baseUrl, schema) => (request, response) => {
     if (pathParams[index + 1]) {
       const personId = pathParams[index + 1];
       params["personId"] = personId;
-      // request.pathname = schema
       request.pathname = schema;
-      // request.pathParams = { personId: "1232-2312-1231-321A" }
       request.pathParams = params;
     }
   }
