@@ -1,4 +1,4 @@
-module.exports = (baseUrl, schema) => (request, response) => {
+module.exports = (baseUrl, schema) => (request) => {
   const parsedUrl = new URL(request.url, baseUrl);
   const params = {};
   const pathParams = parsedUrl.pathname.split("/");
